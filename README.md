@@ -50,7 +50,7 @@ Then edit `.env`:
 | --------------------- | ------------------------------------------------------------------- | ---------------------------- |
 | `BOT_TOKEN`           | Your Telegram bot token (from [@BotFather](https://t.me/BotFather)) | `123456:ABC-DEF...`          |
 | `ADMIN_ID`            | Telegram chat ID allowed to use the bot                             | `123456789`                  |
-| `SUPERVISOR_URL`      | Supervisor XML-RPC endpoint                                         | `http://127.0.0.1:9001/RPC2` |
+| `SUPERVISOR_URL`      | Supervisor XML-RPC endpoint                                         | `http://127.0.0.1:9001` |
 | `TELOXIDE_PROXY`      | Proxy in telegram server communication (Support http/socks5)        | `socks5://127.0.0.1:8443`    |
 
 > ⚠️ Make sure the `.env` file lives in the same directory as the binary when running.
