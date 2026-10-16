@@ -5,6 +5,7 @@
         "serde",
         "statename",
         "teloxide",
+        "tgbot",
         "thiserror"
     ]
 }

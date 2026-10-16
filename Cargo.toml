@@ -1,5 +1,5 @@
 [package]
-name = "miner_manager"
+name = "supervisor_manager_tgbot"
 version = "0.1.0"
 edition = "2021"
 

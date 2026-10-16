@@ -845,23 +845,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "miner_manager"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "dotenv",
- "log",
- "log4rs",
- "regex",
- "serde",
- "serde_json",
- "teloxide",
- "thiserror 2.0.21",
- "tokio",
- "xmlrpc",
-]
-
-[[package]]
 name = "minimal-lexical"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1484,6 +1467,23 @@ name = "strsim"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
+
+[[package]]
+name = "supervisor_manager_tgbot"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "dotenv",
+ "log",
+ "log4rs",
+ "regex",
+ "serde",
+ "serde_json",
+ "teloxide",
+ "thiserror 2.0.21",
+ "tokio",
+ "xmlrpc",
+]
 
 [[package]]
 name = "syn"
