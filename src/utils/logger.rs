@@ -6,12 +6,22 @@ use log4rs::{
     encode::pattern::PatternEncoder,
 };
 
+/// Directory the log files are written to.
+const LOG_DIR: &str = "log";
+
 pub fn initilize() -> Result<(), Box<dyn std::error::Error>> {
+    // `FileAppender` does not create the directory for us.
+    std::fs::create_dir_all(LOG_DIR)?;
+
     let logfile = FileAppender::builder()
         .encoder(Box::new(PatternEncoder::new(
             "[{d(%Y-%m-%d %H:%M:%S)}] - [{l}] - {m}\n",
         )))
-        .build(format!("log/{}.log", Local::now().format("%Y-%m-%d")))?;
+        .build(format!(
+            "{}/{}.log",
+            LOG_DIR,
+            Local::now().format("%Y-%m-%d")
+        ))?;
 
     let config = Config::builder()
         .appender(Appender::builder().build("logfile", Box::new(logfile)))
