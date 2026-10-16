@@ -1,0 +1,154 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch: {}
+
+env:
+  BIN_NAME: supervisor_manager_tgbot
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.os_name }}-${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # ---------- Linux ----------
+          - runner: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            os_name: linux
+            arch: x86_64
+            ext: tar.gz
+            use_cross: false
+
+          - runner: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            os_name: linux
+            arch: arm64
+            ext: tar.gz
+            use_cross: true
+
+          # ---------- macOS ----------
+          - runner: macos-latest
+            target: x86_64-apple-darwin
+            os_name: macos
+            arch: x86_64
+            ext: tar.gz
+            use_cross: false
+
+          - runner: macos-latest
+            target: aarch64-apple-darwin
+            os_name: macos
+            arch: arm64
+            ext: tar.gz
+            use_cross: false
+
+          # ---------- Windows ----------
+          - runner: windows-latest
+            target: x86_64-pc-windows-msvc
+            os_name: windows
+            arch: x86_64
+            ext: zip
+            use_cross: false
+
+          - runner: windows-latest
+            target: aarch64-pc-windows-msvc
+            os_name: windows
+            arch: arm64
+            ext: zip
+            use_cross: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install cross (Linux aarch64 cross-compile)
+        if: matrix.use_cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Cache cargo registry/target
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      - name: Build (cross)
+        if: matrix.use_cross
+        run: cross build --release --locked --target ${{ matrix.target }}
+
+      - name: Build (cargo)
+        if: ${{ !matrix.use_cross }}
+        run: cargo build --release --locked --target ${{ matrix.target }}
+
+      # ---------------- Package: Unix (tar.gz via gzip) ----------------
+      - name: Package tar.gz (macOS/Linux)
+        if: matrix.ext == 'tar.gz'
+        shell: bash
+        run: |
+          set -euo pipefail
+          STAGE_DIR="stage/${{ env.BIN_NAME }}"
+          mkdir -p "$STAGE_DIR"
+          cp "target/${{ matrix.target }}/release/${{ env.BIN_NAME }}" "$STAGE_DIR/"
+          chmod +x "$STAGE_DIR/${{ env.BIN_NAME }}"
+
+          ASSET="${{ env.BIN_NAME }}-${{ matrix.os_name }}-${{ matrix.arch }}.tar.gz"
+          # GZIP_ENV sets max gzip compression level (-9) used by tar's -z flag
+          GZIP=-9 tar -czf "$ASSET" -C stage "${{ env.BIN_NAME }}"
+          echo "ASSET_PATH=$ASSET" >> "$GITHUB_ENV"
+
+      # ---------------- Package: Windows (zip, max compression) --------
+      - name: Package zip (Windows)
+        if: matrix.ext == 'zip'
+        shell: pwsh
+        run: |
+          $stageDir = "stage/${{ env.BIN_NAME }}"
+          New-Item -ItemType Directory -Force -Path $stageDir | Out-Null
+          Copy-Item "target/${{ matrix.target }}/release/${{ env.BIN_NAME }}.exe" -Destination $stageDir
+
+          $asset = "${{ env.BIN_NAME }}-${{ matrix.os_name }}-${{ matrix.arch }}.zip"
+          Compress-Archive -Path "$stageDir/*" -DestinationPath $asset -CompressionLevel Optimal
+          "ASSET_PATH=$asset" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BIN_NAME }}-${{ matrix.os_name }}-${{ matrix.arch }}
+          path: ${{ env.ASSET_PATH }}
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Flatten artifacts into one folder
+        run: |
+          mkdir -p dist
+          find artifacts -type f \( -name "*.tar.gz" -o -name "*.zip" \) -exec cp {} dist/ \;
+          ls -al dist
+
+      - name: Create GitHub Release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
