@@ -103,13 +103,13 @@ impl BotHandler {
 
                 format!(
                     "*name*: {}\n*status*: *{}* {}",
-                    markdown::replace_specail_chars(&program.name),
+                    markdown::replace_special_chars(&program.name),
                     &program.state,
                     state_emoji
                 )
             })
             .collect::<Vec<String>>()
-            .join(&markdown::replace_specail_chars(
+            .join(&markdown::replace_special_chars(
                 &"\n---------------------------------\n".to_string(),
             ));
 
@@ -221,10 +221,10 @@ impl BotHandler {
 
             let text = format!(
                 "*name*: {}\n*status*: *{}* {}\nuptime: {}\n\n\\.",
-                markdown::replace_specail_chars(&program.name),
+                markdown::replace_special_chars(&program.name),
                 &program.state,
                 state_emoji,
-                markdown::replace_specail_chars(&program.uptime)
+                markdown::replace_special_chars(&program.uptime)
             );
 
             self.update_supervisor_message(bot, msg, text, InlineKeyboardMarkup::new(keyboard))

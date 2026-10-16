@@ -1,4 +1,4 @@
-pub fn replace_specail_chars(text: &String) -> String {
+pub fn replace_special_chars(text: &String) -> String {
     let special_chars = vec![
         '_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!',
     ];
