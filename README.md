@@ -74,8 +74,8 @@ Run the bot:
 
 Then open Telegram, find your bot, and send `/start` to manage supervisor.
 
-[Main menu](./assets/main-menu.png)
-[Service menu](./assets/service.png)
+![Main menu](./assets/main-menu.png)
+![Service menu](./assets/service.png)
 
 *(Adjust this table to match your actual command set.)*
 
