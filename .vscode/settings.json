@@ -1,0 +1,10 @@
+{
+    "cSpell.words": [
+        "chrono",
+        "dotenv",
+        "serde",
+        "statename",
+        "teloxide",
+        "thiserror"
+    ]
+}
