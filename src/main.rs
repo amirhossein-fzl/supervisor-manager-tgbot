@@ -9,8 +9,8 @@ use bot::TelegramBotService;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     utils::logger::initilize()?;
     dotenv().ok();
-    let telegram_bot_service = TelegramBotService::new();
-    let _ = telegram_bot_service.initialize().await;
+    let telegram_bot_service = TelegramBotService::new()?;
+    telegram_bot_service.initialize().await?;
 
     Ok(())
 }
