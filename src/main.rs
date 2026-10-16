@@ -7,7 +7,7 @@ use bot::TelegramBotService;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    utils::logger::initilize()?;
+    utils::logger::initialize()?;
     dotenv().ok();
     let telegram_bot_service = TelegramBotService::new()?;
     telegram_bot_service.initialize().await?;

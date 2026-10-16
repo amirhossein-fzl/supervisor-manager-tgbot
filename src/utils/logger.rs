@@ -9,7 +9,7 @@ use log4rs::{
 /// Directory the log files are written to.
 const LOG_DIR: &str = "log";
 
-pub fn initilize() -> Result<(), Box<dyn std::error::Error>> {
+pub fn initialize() -> Result<(), Box<dyn std::error::Error>> {
     // `FileAppender` does not create the directory for us.
     std::fs::create_dir_all(LOG_DIR)?;
 
